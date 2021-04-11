@@ -23,7 +23,7 @@ import (
 // VERSION respects semantic versioning.
 const VERSION = "0.1+110420210202"
 
-// Extention files must end with to be detected by recoder
+// Extension files must end with to be detected by recoder.
 const matchPath = ".recode"
 
 var (
@@ -35,8 +35,19 @@ var (
 
 func main() {
 	sWatchFolder = flag.String("watch", "", "Folder to watch for files ending with .recode")
-	sResultDirectory = flag.String("resulting_directory", "", "Folder where to output the files. Leave default to use same folder as watch")
-	sSpeed := flag.Int("speed", 3, "Imagequant quantization speed. Speed 1 gives marginally better quality at significant CPU cost. Speed 10 has usually 5% lower quality, but is 8 times faster than the default")
+
+	sResultDirectory = flag.String(
+		"resulting_directory", "",
+		"Folder where to output the files. "+
+			"Leave default to use same folder as watch",
+	)
+
+	sSpeed := flag.Int(
+		"speed", 3,
+		"Imagequant quantization speed. Speed 1 gives marginally better quality at significant "+
+			"CPU cost. Speed 10 has usually 5% lower quality, but is 8 times faster than the default",
+	)
+
 	sMinQuality := flag.Int("min_quality", 0, "Minimum quality for Imagequant")
 	sMaxQuality := flag.Int("max_quality", 100, "Maximum quality for Imagequant")
 	flag.Parse()
@@ -75,6 +86,7 @@ func main() {
 	// any existed during downtime.
 
 	recoded := make([]string, 0)
+
 	for _, file := range files {
 		name := file.Name()
 		if strings.HasSuffix(name, matchPath) {
@@ -84,6 +96,7 @@ func main() {
 
 	if len(recoded) > 0 {
 		println("Found", len(recoded), "files to recode")
+
 		for _, file := range recoded {
 			go recodeFile(path.Join(*sWatchFolder, file))
 		}
@@ -95,6 +108,7 @@ func main() {
 			if !ok {
 				return
 			}
+
 			if event.Op&fsnotify.Create == fsnotify.Create {
 				if strings.HasSuffix(event.Name, matchPath) {
 					go recodeFile(event.Name)
@@ -104,6 +118,7 @@ func main() {
 			if !ok {
 				return
 			}
+
 			log.Println("error:", err)
 		}
 	}
@@ -114,9 +129,10 @@ func main() {
 // leave the file alone. If it can parse it it will then attempt
 // to remove any Disposal the GIF may have had. Once this is done, it
 // will then quantize the new frames then save the new file and remove
-// the .recode
+// the .recode.
 func recodeFile(path string) {
 	var err error
+
 	var outputPath string
 
 	start := time.Now()
@@ -127,9 +143,11 @@ func recodeFile(path string) {
 
 	defer func() {
 		println("Recoded " + path + " in " + time.Since(start).String())
+
 		if r := recover(); r != nil {
 			println("! recovered during recoding of file", path)
 		}
+
 		if err != nil {
 			println("! " + err.Error())
 		}
@@ -197,7 +215,7 @@ func recodeFile(path string) {
 	}
 }
 
-// quantizeImage converts an image.Image to image.Paletted via imagequant
+// quantizeImage converts an image.Image to image.Paletted via imagequant.
 func quantizeImage(src image.Image) (*image.Paletted, error) {
 	b := src.Bounds()
 
