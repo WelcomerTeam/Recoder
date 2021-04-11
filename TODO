@@ -1,0 +1,3 @@
+- Ability to use environmental variables rather than relying on CLI arguments
+- Dockerize
+- Potentially implement prometheus metrics
